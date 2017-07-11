@@ -158,22 +158,4 @@ public class CustomAdapter extends BaseAdapter implements Filterable{
             notifyDataSetChanged();
         }
     }
-//    public void filter(String charText) {
-//        charText = charText.toLowerCase(Locale.getDefault());
-//        modellist.clear();
-//        if (charText.length() == 0) {
-//            modellist.addAll(model);
-//        }
-//        else
-//        {
-//            for (Model wp : model)
-//            {
-//                if (wp.getWeb().toLowerCase(Locale.getDefault()).contains(charText))
-//                {
-//                    modellist.add(wp);
-//                }
-//            }
-//        }
-//        notifyDataSetChanged();
-//    }
 }

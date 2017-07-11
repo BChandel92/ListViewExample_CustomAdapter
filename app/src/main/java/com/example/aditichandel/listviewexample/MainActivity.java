@@ -77,9 +77,6 @@ ListView list;
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                String text = filtertext.getText().toString().toLowerCase(Locale.getDefault());
-//                adapter.filter(text);
-//                adapter.notifyDataSetChanged();
 
                 adapter.getFilter().filter(s.toString());
             }
