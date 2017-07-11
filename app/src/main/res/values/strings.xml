@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ListViewExample</string>
+    <string name="editText">Enter value to search</string>
 </resources>

@@ -6,32 +6,51 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Aditi CHANDEL on 03-07-2017.
  */
 
-public class CustomAdapter extends BaseAdapter{
+public class CustomAdapter extends BaseAdapter implements Filterable{
 
     private final Activity context;
-    private final ArrayList<String> web;
-    private final ArrayList<Integer> imageId;
+    private final ArrayList<Model> model;
     boolean[] itemchecked;
+    List<Model> modellist=null;
+    CustomFilter mCustomfilter;
 
-    public CustomAdapter(Activity context, ArrayList<String> web, ArrayList<Integer> imageId) {
+    public CustomAdapter(Activity context,ArrayList<Model> model){
         this.context = context;
-        this.web = web;
-        this.imageId = imageId;
-        itemchecked=new boolean[web.size()];
+
+        this.modellist=model;
+        this.model=new ArrayList<Model>();
+        this.model.addAll(modellist);
+        itemchecked=new boolean[model.size()];
     }
-    public void remove(int position){
-        web.remove(web.get(position));
-      //  imageId.remove(ImageId.get(position));
+    public boolean[] getCheckedBooleanArray(){
+       return itemchecked;
     }
+
+    public void refreshItemcheck(){
+        itemchecked=new boolean[model.size()];
+    }
+
+    @Override
+    public Filter getFilter() {
+        if(mCustomfilter==null)
+            mCustomfilter=new CustomFilter();
+        return mCustomfilter;
+    }
+
     private static class ViewHolder
     {
         TextView txtCountryname;
@@ -41,12 +60,12 @@ public class CustomAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        return web.size();
+        return modellist.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return web.get(position);
+        return modellist.get(position);
     }
 
     @Override
@@ -76,7 +95,9 @@ public class CustomAdapter extends BaseAdapter{
 
             holder = (ViewHolder) convertView.getTag();
         }
-        holder.txtCountryname.setText(web.get(position));
+
+        Glide.with(this.context).load( modellist.get(position).getImageId()).transform(new CircleTransform(context)).into(holder.imagecountry);
+        holder.txtCountryname.setText(modellist.get(position).getWeb());
         holder.check.setChecked(false);
         if (itemchecked[position])
             holder.check.setChecked(true);
@@ -93,6 +114,66 @@ public class CustomAdapter extends BaseAdapter{
                     itemchecked[position] = false;
             }
         });
-        return null;
+        return convertView;
     }
+    private class CustomFilter extends Filter{
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            // Create a FilterResults object
+            FilterResults results = new FilterResults();
+            // If the constraint (search string/pattern) is null
+            // or its length is 0, i.e., its empty then
+            // we just set the `values` property to the
+            // original contacts list which contains all of them
+            if (constraint == null || constraint.length() == 0) {
+                results.values = modellist;
+                results.count = modellist.size();
+            }
+            else {
+                // Some search copnstraint has been passed
+                // so let's filter accordingly
+                ArrayList<Model> filteredContacts = new ArrayList<Model>();
+
+                // We'll go through all the contacts and see
+                // if they contain the supplied string
+                for (Model c : modellist) {
+                    if (c.getWeb().toUpperCase().contains( constraint.toString().toUpperCase() )) {
+                        // if `contains` == true then add it
+                        // to our filtered list
+                        filteredContacts.add(c);
+                    }
+                }
+
+                // Finally set the filtered values and size/count
+                results.values = filteredContacts;
+                results.count = filteredContacts.size();
+            }
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            modellist = (ArrayList<Model>) results.values;
+            notifyDataSetChanged();
+        }
+    }
+//    public void filter(String charText) {
+//        charText = charText.toLowerCase(Locale.getDefault());
+//        modellist.clear();
+//        if (charText.length() == 0) {
+//            modellist.addAll(model);
+//        }
+//        else
+//        {
+//            for (Model wp : model)
+//            {
+//                if (wp.getWeb().toLowerCase(Locale.getDefault()).contains(charText))
+//                {
+//                    modellist.add(wp);
+//                }
+//            }
+//        }
+//        notifyDataSetChanged();
+//    }
 }

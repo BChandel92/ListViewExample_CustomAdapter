@@ -2,94 +2,95 @@ package com.example.aditichandel.listviewexample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity  {
 ListView list;
-    Button btn;
+    Button btn,btnadd;
+    private EditText filtertext;
     CustomAdapter adapter;
+
     ArrayList<String> data = new ArrayList<String>();
-    boolean[] itemchecked;
-    String [] countries = new String[]{
-            "india","Pakistan","Sri Lanka","China","Bangladesh","Nepal","Afghanistan","North Korea","South Korea"
-                                 };
-     ArrayList<Integer> flag=new ArrayList<Integer>();
-    Integer flagdata[]=
-             {
-                    R.drawable.nationalflag5,
-                    R.drawable.nationalflag,
-                     R.drawable.nationalflag3,
-                     R.drawable.nationalflag4,
-                     R.drawable.nationalflag2,
-                     R.drawable.nationalflag6,
-                     R.drawable.nationalflag7,
-                     R.drawable.europe,
-                     R.drawable.download,
-                     R.drawable.south_american_country
-                                                  };
+    ArrayList<Model> model;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Collections.addAll(data,countries);
-        Collections.addAll(flag,flagdata);
-        adapter = new CustomAdapter(MainActivity.this,data,flag);
-        list=(ListView)findViewById(R.id.list_view);
-        //list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        model = new ArrayList<Model>();
+        model.add(new Model("india", R.drawable.nationalflag5));
+        model.add(new Model("Pakistan", R.drawable.nationalflag));
+        model.add(new Model("Sri Lanka", R.drawable.nationalflag3));
+        model.add(new Model("China", R.drawable.nationalflag4));
+        model.add(new Model("Bangladesh", R.drawable.nationalflag2));
+        model.add(new Model("Nepal", R.drawable.nationalflag6));
+        model.add(new Model("Afghanistan", R.drawable.nationalflag7));
+        model.add(new Model("North Korea", R.drawable.europe));
+        model.add(new Model("South Korea", R.drawable.download));
+
+
+        adapter = new CustomAdapter(MainActivity.this, model);
+        list = (ListView) findViewById(R.id.list_view);
         list.setAdapter(adapter);
-
-
-        btn=(Button)findViewById(R.id.btn_New);
-        //onclick listener for btn
-        btn.setOnClickListener(new View.OnClickListener()
-        {
+        btn = (Button) findViewById(R.id.btn_New);
+       /// btnadd=(Button)findViewById(R.id.btn_add);
+        filtertext = (EditText) findViewById(R.id.edit_text);
+        //onclick listener for btn add
+//        btnadd.setOnClickListener(new View.OnClickListener()
+//        {
+//
+//            @Override
+//            public void onClick(View v) {
+//                model.add(new Model("Germany", R.drawable.download));
+//                adapter.notifyDataSetChanged();
+//            }
+//        });
+        //onclick listener for btn delete
+        btn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-               // Toast.makeText(getApplicationContext(),"You have clicked on delete button",Toast.LENGTH_SHORT).show();
-                final String TAG="Hello";
-                Log.e(TAG,"((((((((((((((((((((I shouldn't be here");
 
-                //SparseBooleanArray checkedItemPositions = list.getCheckedItemPositions();
-                int itemCount = list.getCount();
-               // int si=checkedItemPositions.size();
-               // Toast.makeText(getApplicationContext(),"You have clicked on delete button",Toast.LENGTH_SHORT).show();
-
-                for(int i=0; i <itemCount; i++){
-                    if(itemchecked[i]){
-                        int postion=i;
-                       adapter.remove(postion);
-                        --i;
+                boolean[] itemCheckLocal = adapter.getCheckedBooleanArray();
+                int boolSize = itemCheckLocal.length;
+                for (int i = boolSize - 1; i >= 0; i--) {
+                    if (itemCheckLocal[i]) {
+                        model.remove(i);
                     }
-                    adapter.notifyDataSetChanged();
                 }
-               // checkedItemPositions.clear();
+                adapter.refreshItemcheck();
+                adapter.notifyDataSetChanged();
 
+            }
+        });
+        filtertext.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                String text = filtertext.getText().toString().toLowerCase(Locale.getDefault());
+//                adapter.filter(text);
+//                adapter.notifyDataSetChanged();
+
+                adapter.getFilter().filter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
             }
         });
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        CheckBox cb=(CheckBox)findViewById(R.id.simpleCheckBox);
-        cb.performClick();
-        if(cb.isChecked())
-        {
-            itemchecked[position]=true;
-        }
-        else if(!cb.isChecked())
-        {
-            itemchecked[position]=false;
-        }
-
     }
-}
+
+
+
